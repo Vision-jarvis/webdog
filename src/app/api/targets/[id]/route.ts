@@ -45,6 +45,7 @@ const patchSchema = z
     linkScope: z.enum(["NEW", "REMOVED", "BOTH"]).optional(),
     externalNotify: z.boolean().optional(),
     aiChangeSummaryEnabled: z.boolean().optional(),
+    aiTriageEnabled: z.boolean().optional(),
   })
   .refine(
     (d) =>
@@ -53,7 +54,8 @@ const patchSchema = z
       d.notificationDestinationId !== undefined ||
       d.linkScope !== undefined ||
       d.externalNotify !== undefined ||
-      d.aiChangeSummaryEnabled !== undefined,
+      d.aiChangeSummaryEnabled !== undefined ||
+      d.aiTriageEnabled !== undefined,
     {
       message: "At least one field to update is required",
     },
@@ -108,6 +110,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     linkScope?: LinkScope;
     externalNotify?: boolean;
     aiChangeSummaryEnabled?: boolean;
+    aiTriageEnabled?: boolean;
   } = {};
   if (parsed.data.enabled !== undefined) updates.enabled = parsed.data.enabled;
   if (parsed.data.checkIntervalHours !== undefined) {
@@ -140,6 +143,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (parsed.data.linkScope !== undefined) updates.linkScope = parsed.data.linkScope;
   if (parsed.data.aiChangeSummaryEnabled !== undefined) {
     updates.aiChangeSummaryEnabled = parsed.data.aiChangeSummaryEnabled;
+  }
+  if (parsed.data.aiTriageEnabled !== undefined) {
+    updates.aiTriageEnabled = parsed.data.aiTriageEnabled;
   }
 
   await db.update(schema.target).set(updates).where(eq(schema.target.id, id));

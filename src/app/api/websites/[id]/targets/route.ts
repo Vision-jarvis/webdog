@@ -18,6 +18,7 @@ const createSchema = z.discriminatedUnion("category", [
     externalNotify: z.boolean().optional(),
     checkIntervalHours: z.number().min(0.25).max(8760).optional(),
     aiChangeSummaryEnabled: z.boolean().optional(),
+    aiTriageEnabled: z.boolean().optional(),
     watchNote: watchNoteSchema,
   }),
   z.object({
@@ -27,6 +28,7 @@ const createSchema = z.discriminatedUnion("category", [
     externalNotify: z.boolean().optional(),
     checkIntervalHours: z.number().min(0.25).max(8760).optional(),
     aiChangeSummaryEnabled: z.boolean().optional(),
+    aiTriageEnabled: z.boolean().optional(),
     watchNote: watchNoteSchema,
   }),
   z.object({
@@ -36,6 +38,7 @@ const createSchema = z.discriminatedUnion("category", [
     externalNotify: z.boolean().optional(),
     checkIntervalHours: z.number().min(0.25).max(8760).optional(),
     aiChangeSummaryEnabled: z.boolean().optional(),
+    aiTriageEnabled: z.boolean().optional(),
     watchNote: watchNoteSchema,
   }),
 ]);
@@ -100,6 +103,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   const checkIntervalHours = parsed.data.checkIntervalHours ?? 24;
   const aiChangeSummaryEnabled = parsed.data.aiChangeSummaryEnabled ?? false;
+  const aiTriageEnabled = parsed.data.aiTriageEnabled ?? false;
   const watchNote = parsed.data.watchNote?.trim() || null;
 
   const created: (typeof schema.target.$inferSelect)[] = [];
@@ -133,6 +137,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       enabled: true,
       checkIntervalHours,
       aiChangeSummaryEnabled,
+      aiTriageEnabled,
       createdAt: new Date(),
     });
     const [row] = await db.select().from(schema.target).where(eq(schema.target.id, targetId)).limit(1);

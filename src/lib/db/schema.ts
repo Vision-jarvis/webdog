@@ -200,6 +200,13 @@ export const target = pgTable(
     ),
     /** When true, new alerts for this target get an LLM-generated plain-language summary. */
     aiChangeSummaryEnabled: boolean("aiChangeSummaryEnabled").notNull().default(false),
+    /**
+     * When true, a detected change is scored by the LLM against `watchNote` before it
+     * notifies. Changes judged to be noise are stored as suppressed alerts (kept for the
+     * audit trail, marked read, no Slack/email) instead of paging the owner. Fails open:
+     * any triage error surfaces the alert normally.
+     */
+    aiTriageEnabled: boolean("aiTriageEnabled").notNull().default(false),
     createdAt: timestamp("createdAt", { withTimezone: true, precision: 3 })
       .notNull()
       .defaultNow(),
@@ -254,6 +261,13 @@ export const alert = pgTable(
     /** JSON: link/content/product fields depending on kind */
     details: text("details").notNull(),
     read: boolean("read").notNull().default(false),
+    /**
+     * True when the AI relevance filter judged this change to be noise. Suppressed alerts
+     * are persisted (nothing is silently dropped) but arrive read and never notify.
+     */
+    suppressed: boolean("suppressed").notNull().default(false),
+    /** Short LLM rationale for why the change was held; null unless suppressed. */
+    suppressionReason: text("suppressionReason"),
     createdAt: timestamp("createdAt", { withTimezone: true, precision: 3 })
       .notNull()
       .defaultNow(),

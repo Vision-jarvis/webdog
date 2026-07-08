@@ -28,6 +28,7 @@ import {
   trySummarizeAlert,
   type AlertDetailsForSummary,
 } from "./ai-change-summary";
+import { triageAlert } from "./ai-alert-triage";
 
 function sha256(s: string): string {
   return createHash("sha256").update(s).digest("hex");
@@ -137,6 +138,10 @@ interface AlertInsert {
   createdAt: Date;
   /** Extra context for LLM summary; not persisted to alert.details. */
   summaryDetails?: AlertDetailsForSummary;
+  /** Set by the AI relevance filter: held as noise (stored, read, not notified). */
+  suppressed?: boolean;
+  /** Short rationale for suppression; null unless suppressed. */
+  suppressionReason?: string | null;
 }
 
 function linkScopeEmits(scope: string | null | undefined, variant: "new" | "removed"): boolean {
@@ -480,8 +485,34 @@ export async function runWebsiteChecks(
       .where(inArray(schema.target.id, targetIdList));
     const targetById = new Map(targetRows.map((t) => [t.id, t]));
 
+    // AI relevance filter: score each change against the monitor's watch note and
+    // hold the ones judged to be noise. Runs before summarization so a held alert
+    // never costs a summary call. Fails open — triageAlert returns suppress:false
+    // on any misconfig, timeout, or malformed model output, so a real change is
+    // never silently withheld.
     if (aiConfig) {
       for (const a of alerts) {
+        const tgt = targetById.get(a.targetId);
+        if (!tgt?.aiTriageEnabled) continue;
+        const decision = await triageAlert({
+          config: aiConfig,
+          website,
+          alertKind: a.kind,
+          title: a.title,
+          detailsJson: a.details,
+          detailsForSummary: a.summaryDetails,
+          watchNote: tgt.watchNote,
+        });
+        if (decision.suppress) {
+          a.suppressed = true;
+          a.suppressionReason = decision.reason;
+        }
+      }
+    }
+
+    if (aiConfig) {
+      for (const a of alerts) {
+        if (a.suppressed) continue;
         const tgt = targetById.get(a.targetId);
         if (!tgt) continue;
         const dests = resolveDestinationsForTarget(tgt, userDestinations);
@@ -510,6 +541,11 @@ export async function runWebsiteChecks(
         kind: a.kind,
         title: a.title,
         details: a.details,
+        // Held alerts are recorded for the audit trail but arrive read, so they
+        // stay out of unread counts and the notification pass below.
+        read: Boolean(a.suppressed),
+        suppressed: Boolean(a.suppressed),
+        suppressionReason: a.suppressed ? (a.suppressionReason ?? null) : null,
         createdAt: a.createdAt,
       })),
     );
@@ -519,6 +555,7 @@ export async function runWebsiteChecks(
 
     const alertsByDestinationId = new Map<string, NewAlertsAlert[]>();
     for (const a of alerts) {
+      if (a.suppressed) continue;
       const tgt = targetById.get(a.targetId);
       if (!tgt) continue;
       const dests = resolveDestinationsForTarget(tgt, userDestinations);
