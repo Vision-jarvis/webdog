@@ -147,7 +147,7 @@ function truncateChangeText(text: string): string {
   return text.slice(0, MAX_CHANGE_CHARS - 20) + "\n… (truncated)";
 }
 
-function createLanguageModel(config: AiSummaryConfig) {
+export function createLanguageModel(config: AiSummaryConfig) {
   if (config.provider === "openai") {
     return createOpenAI({ apiKey: config.apiKey })(config.model);
   }

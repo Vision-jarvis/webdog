@@ -81,6 +81,7 @@ Each monitor has its own check interval (fractional hours supported — `0.25` =
 ### Everything else
 
 - **AI change summaries** — optional per-monitor plain-language summaries of what changed and why it matters, via OpenAI or the Vercel AI Gateway.
+- **AI relevance filter** — optional per-monitor triage that scores each detected change against the monitor's watch note before it notifies. Routine noise (cookie banners, rotating ads, view counters, timestamps) is held in the dashboard instead of paging you. Nothing is deleted — held changes are still stored and viewable, just not delivered — and it fails open, so any triage error surfaces the alert normally.
 - **Visual diffs** — GitHub-style added/removed line views for every content change.
 - **Screenshots** — every check captures a fresh page screenshot, so you can see the current state at a glance.
 - **Brand-aware dashboard** — adding a website auto-fills its logo, title, description, and a hero screenshot using [Context.dev](https://link.context.dev/webdog) brand data.
@@ -288,6 +289,7 @@ src/
     db/schema.ts        # Drizzle schema (source of truth for the data model)
     notify-*.ts         # Slack / Resend / webhook delivery
     ai-change-summary.ts# LLM summaries of diffs
+    ai-alert-triage.ts  # LLM relevance filter that holds noisy changes
 scripts/
   worker.ts             # Cron worker entrypoint
 drizzle/                # SQL migrations
