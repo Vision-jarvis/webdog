@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1778382310264,
+      "tag": "0000_steep_king_cobra",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780145027418,
+      "tag": "0001_lazy_sheva_callister",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783476106704,
+      "tag": "0002_slow_molten_man",
+      "breakpoints": true
+    }
+  ]
+}
