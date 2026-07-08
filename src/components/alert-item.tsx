@@ -257,7 +257,7 @@ function AttributionText({ text }: { text: string }) {
           {part}
           {i < parts.length - 1 && (
             <a
-              href="https://context.dev"
+              href="https://link.context.dev/webdog"
               target="_blank"
               rel="noreferrer noopener"
               className="text-neutral-500 underline-offset-2 hover:text-brand-700 hover:underline"

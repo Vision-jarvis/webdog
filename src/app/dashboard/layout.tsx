@@ -99,7 +99,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <main className="relative min-w-0">{children}</main>
 
       <a
-        href="https://context.dev"
+        href="https://link.context.dev/webdog"
         target="_blank"
         rel="noreferrer noopener"
         aria-label="Built using Context.dev"

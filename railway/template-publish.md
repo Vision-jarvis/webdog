@@ -40,7 +40,7 @@ Set descriptions in the Railway UI exactly as below so deployers know what to en
 
 | Name | Required | Description |
 |------|----------|-------------|
-| **`CONTEXT_DEV_API_KEY`** | Yes | Bearer API key from [context.dev](https://context.dev). Required for scraping and extraction. |
+| **`CONTEXT_DEV_API_KEY`** | Yes | Bearer API key from [context.dev](https://link.context.dev/webdog). Required for scraping and extraction. |
 | **`RESEND_API_KEY`** | No | Server-managed Resend API key for email notifications. When set with **`RESEND_SEND_FROM_EMAIL`**, users configure recipients only. |
 | **`RESEND_SEND_FROM_EMAIL`** | No | Server-managed sender address for email notifications. When set, the sender is not editable in the dashboard. |
 | **`MAX_ALERTS`** | No | Maximum number of active monitors per account. Omit for unlimited monitors. |
@@ -88,7 +88,7 @@ You deploy one Railway app service from this repository and one PostgreSQL servi
 
 - Source repository URL you attach to the template service (your **`https://github.com/…/webdog-ai`** fork or canonical repo)
 - Railway PostgreSQL service
-- [context.dev](https://context.dev)
+- [context.dev](https://link.context.dev/webdog)
 - [Railway health checks](https://docs.railway.com/guides/healthchecks)
 - [Template best practices](https://docs.railway.com/templates/best-practices)
 

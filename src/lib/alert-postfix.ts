@@ -2,7 +2,7 @@
  * Optional deployment attribution (POSTFIX_TO_ALERTS) for notification footers.
  */
 
-const CONTEXT_DEV_URL = "https://context.dev";
+const CONTEXT_DEV_URL = "https://link.context.dev/webdog";
 
 export function stripAlertPostfixText(text: string, postfix: string | null | undefined): string {
   if (!postfix) return text;

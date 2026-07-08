@@ -80,14 +80,14 @@ export function ContextDevOnboardingForm({
           <span className="font-medium text-neutral-900">{APP_NAME}</span> is powered by the Context.dev APIs.
           Visit{" "}
           <a
-            href="https://context.dev/signup"
+            href="https://link.context.dev/webdog"
             target="_blank"
             rel="noreferrer noopener"
             className="font-medium text-brand-700 underline decoration-brand-500/30 underline-offset-2 hover:decoration-brand-500"
           >
-            context.dev/signup
+            context.dev
           </a>{" "}
-          to get your free API key, paste it below, and continue.
+          to sign up and get your free API key, paste it below, and continue.
         </p>
 
         <form onSubmit={onContinue} className="mt-8 space-y-4">

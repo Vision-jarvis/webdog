@@ -381,7 +381,7 @@ export default async function LandingPage() {
 
       {/* Fortune cookie */}
       <a
-        href="https://context.dev"
+        href="https://link.context.dev/webdog"
         target="_blank"
         rel="noreferrer noopener"
         aria-label="Built using Context.dev"
