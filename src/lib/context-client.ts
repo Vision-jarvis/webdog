@@ -358,10 +358,16 @@ export interface BrandData {
 
 export async function retrieveBrand(
   domain: string,
-  options?: { apiKey?: string | null },
+  options?: { apiKey?: string | null; maxAgeMs?: number },
 ): Promise<BrandData> {
+  // `maxAgeMs: 0` forces a fresh (billable) retrieval. Callers that only need a
+  // logo/asset (e.g. starter templates) should pass a large window so context.dev
+  // can serve its cached brand record instead of re-crawling.
   const res = await withContextDevErrors(() =>
-    contextDevClient(options?.apiKey).brand.retrieve({ domain, maxAgeMs: 0 }),
+    contextDevClient(options?.apiKey).brand.retrieve({
+      domain,
+      maxAgeMs: options?.maxAgeMs ?? 0,
+    }),
   );
   return toBrandData(res.brand, domain);
 }
