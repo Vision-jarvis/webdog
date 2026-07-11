@@ -3,9 +3,8 @@ import { redirect } from "next/navigation";
 import { APP_NAME } from "@/lib/product-info";
 import { getCurrentSession } from "@/lib/session";
 import { STARTER_TEMPLATES } from "@/lib/starter-templates";
-import { getStarterTemplatesWithLogos } from "@/lib/starter-template-logos.server";
+import { getBrandLogoMap } from "@/lib/brand-logos.server";
 import { effectiveContextDevApiKey } from "@/lib/server-managed-config";
-import { retrieveBrand, pickBrandAssets } from "@/lib/context-client";
 import { WatchInput } from "@/components/watch-input";
 import { AnimatedNotifList } from "@/components/animated-notif-list";
 import type { NotifItem } from "@/components/animated-notif-list";
@@ -42,38 +41,24 @@ export default async function LandingPage() {
   if (session?.user) redirect("/dashboard");
 
   const apiKey = effectiveContextDevApiKey(null);
-  let templates: StarterTemplateWithLogo[] = STARTER_TEMPLATES.map((t) => ({ ...t, logoUrl: null }));
-  try {
-    templates = await getStarterTemplatesWithLogos(apiKey);
-  } catch {
-    /* fall back to initials */
-  }
 
-  const logoMap = Object.fromEntries(templates.map((t) => [t.domain, t.logoUrl]));
+  // One cached, deduped lookup for every domain the page shows (templates + notif brands).
+  const logoMap = await getBrandLogoMap(
+    [
+      ...STARTER_TEMPLATES.map((t) => t.domain),
+      ...RAW_NOTIFS.map((n) => n.logoDomain ?? n.domain),
+    ],
+    apiKey,
+  );
 
-  // Fetch logos for any notif logoDomain overrides not already in the template map.
-  const extraDomains = [...new Set(
-    RAW_NOTIFS.filter((n) => n.logoDomain && !(n.logoDomain in logoMap)).map((n) => n.logoDomain!),
-  )];
-  const extraLogoMap: Record<string, string | null> = {};
-  if (apiKey && extraDomains.length > 0) {
-    await Promise.all(
-      extraDomains.map(async (d) => {
-        try {
-          const brand = await retrieveBrand(d, { apiKey });
-          const { logoUrl } = pickBrandAssets(brand);
-          extraLogoMap[d] = logoUrl;
-        } catch {
-          extraLogoMap[d] = null;
-        }
-      }),
-    );
-  }
+  const templates: StarterTemplateWithLogo[] = STARTER_TEMPLATES.map((t) => ({
+    ...t,
+    logoUrl: logoMap[t.domain] ?? null,
+  }));
 
   const notifItems: NotifItem[] = RAW_NOTIFS.map((n) => {
     const lookupDomain = n.logoDomain ?? n.domain;
-    const logoUrl = logoMap[lookupDomain] ?? extraLogoMap[lookupDomain] ?? null;
-    return { ...n, logoUrl };
+    return { ...n, logoUrl: logoMap[lookupDomain] ?? null };
   });
 
   return (

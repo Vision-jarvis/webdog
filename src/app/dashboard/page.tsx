@@ -5,7 +5,7 @@ import { websiteOwnerAccessible } from "@/lib/account-access";
 import { requireUser } from "@/lib/session";
 import { WebsiteListView } from "@/components/website-list-view";
 import { effectiveContextDevApiKey } from "@/lib/server-managed-config";
-import { getStarterTemplatesWithLogos } from "@/lib/starter-template-logos.server";
+import { getStarterTemplatesWithLogos } from "@/lib/brand-logos.server";
 import { STARTER_TEMPLATES } from "@/lib/starter-templates";
 
 export default async function DashboardPage() {
